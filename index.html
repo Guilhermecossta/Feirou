@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabela da Feira</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow-x: hidden;
+        }
+
+        .tudo{
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        .conteudo{
+            max-width: 600px;
+            margin: auto;
+            text-align: center;
+            background-color: antiquewhite;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        h1{
+            padding: 20px 0;
+        }
+
+        .formulario {
+            display: flex; 
+            justify-content: center;
+            align-items: flex-end;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .campo {
+            text-align: left;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+
+        button {
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            height: 38px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #ddd;
+        }
+
+        #resultado {
+            padding: 20px; 
+            font-size: 30px;
+        }
+
+        /* Botão Concluir Compra */
+        .btn-concluir {
+            width: 100%;
+            margin-top: 40px;
+            background-color: #008CBA;
+            font-size: 16px;
+        }
+
+        .btn-concluir:hover {
+            background-color: #007bb5;
+        }
+
+        /* Botão do Menu Flutuante */
+        #menu{
+            width: 50px;
+            height: 50px;
+            background-color: rgb(131, 9, 9);
+            border-radius: 100%;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            cursor: pointer;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+        }
+
+        #menu:hover {
+            transform: scale(1.1);
+        }
+
+        /* Aba de Remoção Parcial */
+        #remover{
+            position: fixed;
+            bottom: 80px;
+            right: -250px; 
+            width: 230px;
+            background-color: #333;
+            color: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: right 0.3s ease;
+            z-index: 99;
+        }
+
+        #remover.ativo {
+            right: 20px;
+        }
+
+        #remover h4 {
+            margin-bottom: 8px;
+        }
+
+        #remover button {
+            background-color: #d9534f;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        #remover button:hover {
+            background-color: #c9302c;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="menu" onclick="alternarMenu()"></div>
+
+    <div id="remover">
+        <h4>Subtrair Item</h4>
+        
+        <div style="text-align: left; margin-bottom: 10px;">
+            <label for="seletor-produtos">Produto:</label>
+            <select id="seletor-produtos">
+                <option value="">Escolha um item</option>
+            </select>
+        </div>
+
+        <div style="text-align: left;">
+            <label for="quantia">Quantidade a remover:</label>
+            <input type="number" id="quantia" value="1" min="1" style="color: black;">
+        </div>
+
+        <button onclick="removerItem()">Remover</button>
+    </div>
+
+    <div class="tudo">
+        <div class="conteudo">
+            <h1>Tabela da Feira</h1>
+
+            <div id="resultado">
+                TOTAL
+                <div style="font-weight: 600;" class="valor">R$ <span id="total-geral">0,00</span></div>
+            </div>
+
+            <div class="formulario">
+                <div class="campo" style="width: 40%; text-align: center;">
+                    <h5>Produto</h5>
+                    <input id="item" type="text" placeholder="Ex: Maçã">
+                </div>
+
+                <div class="campo" style="width: 25%; text-align: center;">
+                    <h5>Valor</h5>
+                    <input type="number" step="0.01" id="valor" placeholder="0.00">
+                </div>
+
+                <div class="campo" style="width: 25%;">
+                    <h5>Quantidade</h5>
+                    <input type="number" id="qtd">
+                </div>
+
+                <button onclick="adicionarItem()">+</button>
+            </div>
+
+            <table id="lista">
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th>Qtd</th>
+                        <th>Valor Unit.</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody id="corpo-tabela" style="font-weight: 600;">
+                    </tbody>
+            </table>
+
+            <button class="btn-concluir" onclick="concluirCompra()">Concluir feira</button>
+        </div>
+    </div>
+
+    <script>
+        let totalAcumulado = 0;
+        
+        // Tenta buscar itens já salvos no localStorage. Se não houver nada, começa com um array vazio.
+        let listaItens = JSON.parse(localStorage.getItem('feira_itens')) || []; 
+
+        // Executa assim que a página carrega para resgatar os dados salvos
+        window.onload = function() {
+            renderizarTabela();
+        };
+
+        // 1. Abre/Fecha menu lateral
+        function alternarMenu() {
+            const abaRemover = document.getElementById('remover');
+            abaRemover.classList.toggle('ativo');
+        }
+
+        // 2. Atualiza a lista de opções do menu lateral
+        function atualizarSeletor() {
+            const seletor = document.getElementById('seletor-produtos');
+            seletor.innerHTML = '<option value="">-- Escolha um item --</option>';
+
+            listaItens.forEach((item, index) => {
+                const opt = document.createElement('option');
+                opt.value = index; 
+                opt.textContent = `${item.nome} (Possui: ${item.qtd})`;
+                seletor.appendChild(opt);
+            });
+        }
+
+        // 3. Adiciona itens ou soma se o produto já existir na lista
+        function adicionarItem() {
+            const inputItem = document.getElementById('item');
+            const inputValor = document.getElementById('valor');
+            const inputQtd = document.getElementById('qtd');
+
+            const nomeItem = inputItem.value.trim();
+            const valorUnitario = parseFloat(inputValor.value);
+            const quantidade = parseInt(inputQtd.value);
+
+            if (nomeItem === '' || isNaN(valorUnitario) || isNaN(quantidade) || quantidade <= 0) {
+                alert('Por favor, preencha todos os campos corretamente!');
+                return;
+            }
+
+            const itemExistente = listaItens.find(item => item.nome.toLowerCase() === nomeItem.toLowerCase());
+
+            if (itemExistente) {
+                itemExistente.qtd += quantidade;
+                itemExistente.total += (valorUnitario * quantidade);
+            } else {
+                listaItens.push({
+                    nome: nomeItem,
+                    qtd: quantidade,
+                    valorUnit: valorUnitario,
+                    total: valorUnitario * quantidade
+                });
+            }
+
+            renderizarTabela();
+
+            // Limpa os campos
+            inputItem.value = '';
+            inputValor.value = '';
+            inputQtd.value = '1';
+            inputItem.focus();
+        }
+
+        // 4. Recalcula valores, redesenha a tabela e salva no localStorage
+        function renderizarTabela() {
+            const corpoTabela = document.getElementById('corpo-tabela');
+            const elementoTotalGeral = document.getElementById('total-geral');
+            
+            corpoTabela.innerHTML = '';
+            totalAcumulado = 0;
+
+            listaItens.forEach((item) => {
+                const novaLinha = document.createElement('tr');
+                novaLinha.innerHTML = `
+                    <td>${item.nome}</td>
+                    <td>${item.qtd}</td>
+                    <td>R$ ${item.valorUnit.toFixed(2).replace('.', ',')}</td>
+                    <td>R$ ${item.total.toFixed(2).replace('.', ',')}</td>
+                `;
+                corpoTabela.appendChild(novaLinha);
+                totalAcumulado += item.total;
+            });
+
+            elementoTotalGeral.textContent = totalAcumulado.toFixed(2).replace('.', ',');
+            
+            // SALVA A LISTA ATUALIZADA NO NAVEGADOR
+            localStorage.setItem('feira_itens', JSON.stringify(listaItens));
+            
+            atualizarSeletor(); 
+        }
+
+        // 5. Remove apenas a quantidade escolhida
+        function removerItem() {
+            const seletor = document.getElementById('seletor-produtos');
+            const inputQuantiaRemover = document.getElementById('quantia');
+            
+            const indexSelecionado = seletor.value;
+            const qtdParaRemover = parseInt(inputQuantiaRemover.value);
+
+            if (indexSelecionado === "") {
+                alert("Selecione um produto válido!");
+                return;
+            }
+
+            if (isNaN(qtdParaRemover) || qtdParaRemover <= 0) {
+                alert("Digite uma quantidade válida para remover!");
+                return;
+            }
+
+            const itemSelecionado = listaItens[indexSelecionado];
+
+            if (qtdParaRemover > itemSelecionado.qtd) {
+                alert(`Você não pode remover ${qtdParaRemover} itens. Você só tem ${itemSelecionado.qtd} na lista!`);
+                return;
+            }
+
+            itemSelecionado.qtd -= qtdParaRemover;
+            itemSelecionado.total -= (itemSelecionado.valorUnit * qtdParaRemover);
+
+            if (itemSelecionado.qtd === 0) {
+                listaItens.splice(indexSelecionado, 1);
+            }
+
+            renderizarTabela();
+            inputQuantiaRemover.value = '1';
+            alternarMenu();
+        }
+
+        // 6. Limpa toda a lista e o armazenamento local
+        function concluirCompra() {
+            if (listaItens.length === 0) {
+                alert("Sua lista já está vazia!");
+                return;
+            }
+
+            if (confirm("Deseja fechar e limpar a lista da feira?")) {
+                listaItens = []; // Esvazia o array
+                localStorage.removeItem('feira_itens'); // Apaga o registro do localStorage
+                renderizarTabela(); // Redesenha a tabela vazia
+                alert("Compra concluída com sucesso!");
+            }
+        }
+    </script>
+</body>
+</html>
