@@ -3,380 +3,561 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tabela da Feira</title>
+    <title>Feirou - Calculadora e Controle de Feira</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        feiraGreen: '#16a34a', // Verde folha
+                        feiraGreenDark: '#15803d',
+                        feiraYellow: '#eab308', // Amarelo vivo
+                        feiraOrange: '#f97316', // Laranja vivo
+                        feiraRed: '#dc2626', // Vermelho tomate
+                        feiraRedDark: '#b91c1c',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        *{
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            overflow-x: hidden;
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
         }
-
-        .tudo{
-            min-height: 100vh;
-            font-family: Arial, Helvetica, sans-serif;
-            background-color: #f4f4f4;
-            padding: 20px;
+        /* Custom scrollbar for clean mobile feel */
+        ::-webkit-scrollbar {
+            width: 4px;
         }
-
-        .conteudo{
-            max-width: 600px;
-            margin: auto;
-            text-align: center;
-            background-color: antiquewhite;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        h1{
-            padding: 20px 0;
-        }
-
-        .formulario {
-            display: flex; 
-            justify-content: center;
-            align-items: flex-end;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-
-        .campo {
-            text-align: left;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db;
             border-radius: 4px;
-            margin-top: 5px;
-        }
-
-        button {
-            padding: 8px 15px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            height: 38px;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background: white;
-        }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #ddd;
-        }
-
-        #resultado {
-            padding: 20px; 
-            font-size: 30px;
-        }
-
-        /* Botão Concluir Compra */
-        .btn-concluir {
-            width: 100%;
-            margin-top: 40px;
-            background-color: #008CBA;
-            font-size: 16px;
-        }
-
-        .btn-concluir:hover {
-            background-color: #007bb5;
-        }
-
-        /* Botão do Menu Flutuante */
-        #menu{
-            width: 50px;
-            height: 50px;
-            background-color: rgb(131, 9, 9);
-            border-radius: 100%;
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            cursor: pointer;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 20px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            transition: transform 0.2s;
-        }
-
-        #menu:hover {
-            transform: scale(1.1);
-        }
-
-        /* Aba de Remoção Parcial */
-        #remover{
-            position: fixed;
-            bottom: 80px;
-            right: -250px; 
-            width: 230px;
-            background-color: #333;
-            color: white;
-            border-radius: 10px;
-            padding: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            transition: right 0.3s ease;
-            z-index: 99;
-        }
-
-        #remover.ativo {
-            right: 20px;
-        }
-
-        #remover h4 {
-            margin-bottom: 8px;
-        }
-
-        #remover button {
-            background-color: #d9534f;
-            width: 100%;
-            margin-top: 15px;
-        }
-
-        #remover button:hover {
-            background-color: #c9302c;
         }
     </style>
 </head>
-<body>
+<body class="flex items-center justify-center min-h-screen p-0 sm:p-4">
 
-    <div id="menu" onclick="alternarMenu()"></div>
+    <!-- Mobile Simulator Container -->
+    <div class="w-full sm:max-w-md sm:h-[850px] sm:rounded-[3rem] sm:shadow-2xl bg-white flex flex-col overflow-hidden relative border border-gray-200">
 
-    <div id="remover">
-        <h4>Subtrair Item</h4>
-        
-        <div style="text-align: left; margin-bottom: 10px;">
-            <label for="seletor-produtos">Produto:</label>
-            <select id="seletor-produtos">
-                <option value="">Escolha um item</option>
-            </select>
-        </div>
-
-        <div style="text-align: left;">
-            <label for="quantia">Quantidade a remover:</label>
-            <input type="number" id="quantia" value="1" min="1" style="color: black;">
-        </div>
-
-        <button onclick="removerItem()">Remover</button>
-    </div>
-
-    <div class="tudo">
-        <div class="conteudo">
-            <h1>Tabela da Feira</h1>
-
-            <div id="resultado">
-                TOTAL
-                <div style="font-weight: 600;" class="valor">R$ <span id="total-geral">0,00</span></div>
+        <!-- Top Header & Budget Banner -->
+        <header class="bg-gradient-to-r from-feiraGreen to-feiraGreenDark text-white p-5 pt-8 sm:pt-6 rounded-b-[2rem] shadow-lg relative z-10">
+            <div class="flex justify-between items-center mb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl">🛒</span>
+                    <h1 class="text-xl font-bold tracking-tight">Feirou</h1>
+                </div>
+                <button onclick="abrirConfigOrcamento()" class="bg-white/20 hover:bg-white/30 text-white text-xs font-semibold px-3 py-1.5 rounded-full transition flex items-center gap-1 backdrop-blur-sm">
+                    ⚙️ <span id="btn-orcamento-texto">Meta: R$ 0,00</span>
+                </button>
             </div>
 
-            <div class="formulario">
-                <div class="campo" style="width: 40%; text-align: center;">
-                    <h5>Produto</h5>
-                    <input id="item" type="text" placeholder="Ex: Maçã">
+            <!-- Total Display Card -->
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 text-center mt-2">
+                <p class="text-xs uppercase tracking-wider text-emerald-100 font-medium">Total da Feira</p>
+                <h2 id="display-total" class="text-4xl font-extrabold tracking-tight my-1 text-white">R$ 0,00</h2>
+                <div id="status-orcamento-container" class="hidden mt-2">
+                    <div class="w-full bg-black/20 rounded-full h-2.5 overflow-hidden">
+                        <div id="barra-progresso" class="bg-feiraYellow h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                    <p id="alerta-orcamento" class="text-xs mt-1 text-emerald-100 font-medium">Dentro do orçamento</p>
                 </div>
+            </div>
+        </header>
 
-                <div class="campo" style="width: 25%; text-align: center;">
-                    <h5>Valor</h5>
-                    <input type="number" step="0.01" id="valor" placeholder="0.00">
+        <!-- Form Section -->
+        <section class="p-4 bg-gray-50 border-b border-gray-100">
+            <!-- AI Scanner Trigger Banner -->
+            <div class="mb-3 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl p-3 text-white shadow-md flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">📸</span>
+                    <div>
+                        <h3 class="text-xs font-bold uppercase tracking-wider">Escaneamento Inteligente</h3>
+                        <p class="text-[11px] text-amber-100">Fotografe a etiqueta do produto ou prateleira</p>
+                    </div>
                 </div>
-
-                <div class="campo" style="width: 25%;">
-                    <h5>Quantidade</h5>
-                    <input type="number" id="qtd">
-                </div>
-
-                <button onclick="adicionarItem()">+</button>
+                <button onclick="abrirScanner()" class="bg-white text-orange-600 hover:bg-orange-50 font-bold text-xs px-3 py-2 rounded-lg shadow transition transform active:scale-95 flex items-center gap-1">
+                    ✨ Escanear
+                </button>
             </div>
 
-            <table id="lista">
-                <thead>
-                    <tr>
-                        <th>Produto</th>
-                        <th>Qtd</th>
-                        <th>Valor Unit.</th>
-                        <th>Total</th>
-                    </tr>
-                </thead>
-                <tbody id="corpo-tabela" style="font-weight: 600;">
-                    </tbody>
-            </table>
+            <form id="form-produto" onsubmit="adicionarProduto(event)" class="space-y-3">
+                <div class="flex gap-2">
+                    <div class="flex-1">
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">PRODUTO / BARRACA</label>
+                        <input type="text" id="input-nome" placeholder="Ex: Tomate, Batata..." required
+                            class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-feiraGreen focus:border-transparent transition shadow-sm">
+                    </div>
+                    <div class="w-32">
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">VALOR (R$)</label>
+                        <input type="number" id="input-preco" step="0.01" min="0.01" placeholder="0,00" required
+                            class="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-feiraGreen focus:border-transparent transition shadow-sm text-right font-medium">
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-feiraOrange hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-xl shadow-md transition transform active:scale-[0.98] flex items-center justify-center gap-2 text-sm">
+                    <span>➕</span> Adicionar à Sacola
+                </button>
+            </form>
+        </section>
 
-            <button class="btn-concluir" onclick="concluirCompra()">Concluir feira</button>
+        <!-- Product List Section -->
+        <main class="flex-1 overflow-y-auto p-4 space-y-2 bg-gray-50/50" id="lista-container">
+            <div id="estado-vazio" class="h-full flex flex-col items-center justify-center text-center text-gray-400 py-12">
+                <div class="text-5xl mb-3">🛍️</div>
+                <p class="text-sm font-medium">Sua sacola está vazia.</p>
+                <p class="text-xs text-gray-400 mt-1">Adicione os produtos acima para somar na hora!</p>
+            </div>
+            <ul id="lista-produtos" class="space-y-2.5"></ul>
+        </main>
+
+        <!-- Footer / Action Buttons -->
+        <footer class="p-4 bg-white border-t border-gray-200 flex gap-3 shadow-inner">
+            <button onclick="confirmarLimparTudo()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-4 rounded-xl transition text-sm flex items-center justify-center gap-1.5 border border-gray-300">
+                🗑️ Limpar Tudo
+            </button>
+            <button onclick="compartilharResumo()" class="flex-1 bg-feiraGreen hover:bg-feiraGreenDark text-white font-semibold py-3 px-4 rounded-xl transition text-sm shadow-md flex items-center justify-center gap-1.5">
+                📤 Compartilhar
+            </button>
+        </footer>
+
+    </div>
+
+    <!-- Modal Orçamento -->
+    <div id="modal-orcamento" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl transform transition-all">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-800">Definir Teto de Gastos</h3>
+                <button onclick="fecharConfigOrcamento()" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
+            </div>
+            <p class="text-xs text-gray-500 mb-4">Informe quanto você pretende gastar hoje na feira para receber alertas visuais.</p>
+            <div class="mb-4">
+                <label class="block text-xs font-semibold text-gray-600 mb-1">VALOR LIMITE (R$)</label>
+                <input type="number" id="input-orcamento-meta" step="1" min="0" placeholder="Ex: 100,00"
+                    class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-feiraGreen text-lg font-bold text-center">
+            </div>
+            <div class="flex gap-2">
+                <button onclick="salvarOrcamento()" class="flex-1 bg-feiraGreen hover:bg-feiraGreenDark text-white font-bold py-3 rounded-xl transition shadow-md">Salvar</button>
+                <button onclick="removerOrcamento()" class="bg-gray-100 hover:bg-gray-200 text-feiraRed font-bold px-4 py-3 rounded-xl transition">Remover Meta</button>
+            </div>
         </div>
     </div>
 
+    <!-- Modal Scanner IA -->
+    <div id="modal-scanner" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex flex-col items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-5 shadow-2xl flex flex-col items-center relative overflow-hidden">
+            <button onclick="fecharScanner()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
+            
+            <div class="text-center mb-4">
+                <span class="text-3xl">✨</span>
+                <h3 class="text-lg font-bold text-gray-800">IA Leitor de Etiquetas</h3>
+                <p class="text-xs text-gray-500">Tire uma foto ou envie a imagem da etiqueta com o preço</p>
+            </div>
+
+            <!-- Preview / Camera Container -->
+            <div id="scanner-view-container" class="w-full h-64 bg-gray-900 rounded-2xl overflow-hidden relative flex items-center justify-center mb-4 border border-gray-200">
+                <video id="camera-video" autoplay playsinline class="w-full h-full object-cover hidden"></video>
+                <canvas id="camera-canvas" class="hidden"></canvas>
+                <div id="scanner-placeholder" class="text-center p-6 text-gray-400 flex flex-col items-center justify-center">
+                    <span class="text-4xl mb-2">📷</span>
+                    <p class="text-xs">Ative a câmera ou selecione uma imagem do seu dispositivo</p>
+                </div>
+                <!-- Loading overlay -->
+                <div id="scanner-loading" class="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center text-white hidden">
+                    <div class="w-8 h-8 border-4 border-feiraGreen border-t-transparent rounded-full animate-spin mb-2"></div>
+                    <p class="text-xs font-medium">Analisando etiqueta com IA...</p>
+                </div>
+            </div>
+
+            <!-- Actions inside Modal -->
+            <div class="w-full space-y-2">
+                <div id="camera-controls" class="flex gap-2 hidden">
+                    <button onclick="tirarFoto()" class="flex-1 bg-feiraGreen hover:bg-feiraGreenDark text-white font-bold py-3 rounded-xl transition text-sm shadow-md flex items-center justify-center gap-1">
+                        📸 Capturar Foto
+                    </button>
+                    <button onclick="pararCamera()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-3 rounded-xl transition text-sm">
+                        ❌ Fechar
+                    </button>
+                </div>
+
+                <div id="initial-scanner-controls" class="space-y-2">
+                    <button onclick="iniciarCamera()" class="w-full bg-feiraGreen hover:bg-feiraGreenDark text-white font-bold py-3 rounded-xl transition text-sm shadow-md flex items-center justify-center gap-1.5">
+                        📷 Usar Câmera
+                    </button>
+                    <label class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 rounded-xl transition text-sm cursor-pointer flex items-center justify-center gap-1.5 border border-gray-300">
+                        📁 Enviar Imagem da Galeria
+                        <input type="file" accept="image/*" onchange="processarArquivoImagem(event)" class="hidden">
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Notification / Message Box -->
+    <div id="modal-mensagem" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-xs w-full p-5 shadow-2xl text-center transform transition-all">
+            <h4 id="msg-titulo" class="font-bold text-gray-800 text-base mb-2">Aviso</h4>
+            <p id="msg-texto" class="text-xs text-gray-600 mb-4"></p>
+            <button onclick="fecharMensagem()" class="w-full bg-feiraGreen hover:bg-feiraGreenDark text-white font-bold py-2.5 rounded-xl text-sm transition">OK</button>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Logic -->
     <script>
-        let totalAcumulado = 0;
-        
-        // Tenta buscar itens já salvos no localStorage. Se não houver nada, começa com um array vazio.
-        let listaItens = JSON.parse(localStorage.getItem('feira_itens')) || []; 
+        let produtos = JSON.parse(localStorage.getItem('feira_produtos')) || [];
+        let orcamentoMaximo = parseFloat(localStorage.getItem('feira_orcamento')) || 0;
+        let mediaStream = null;
 
-        // Executa assim que a página carrega para resgatar os dados salvos
         window.onload = function() {
-            renderizarTabela();
+            atualizarTela();
         };
 
-        // 1. Abre/Fecha menu lateral
-        function alternarMenu() {
-            const abaRemover = document.getElementById('remover');
-            abaRemover.classList.toggle('ativo');
+        function mostrarMensagem(titulo, texto) {
+            document.getElementById('msg-titulo').innerText = titulo;
+            document.getElementById('msg-texto').innerText = texto;
+            document.getElementById('modal-mensagem').classList.remove('hidden');
         }
 
-        // 2. Atualiza a lista de opções do menu lateral
-        function atualizarSeletor() {
-            const seletor = document.getElementById('seletor-produtos');
-            seletor.innerHTML = '<option value="">-- Escolha um item --</option>';
-
-            listaItens.forEach((item, index) => {
-                const opt = document.createElement('option');
-                opt.value = index; 
-                opt.textContent = `${item.nome} (Possui: ${item.qtd})`;
-                seletor.appendChild(opt);
-            });
+        function fecharMensagem() {
+            document.getElementById('modal-mensagem').classList.add('hidden');
         }
 
-        // 3. Adiciona itens ou soma se o produto já existir na lista
-        function adicionarItem() {
-            const inputItem = document.getElementById('item');
-            const inputValor = document.getElementById('valor');
-            const inputQtd = document.getElementById('qtd');
+        function adicionarProduto(event) {
+            event.preventDefault();
+            const nomeInput = document.getElementById('input-nome');
+            const precoInput = document.getElementById('input-preco');
 
-            const nomeItem = inputItem.value.trim();
-            const valorUnitario = parseFloat(inputValor.value);
-            const quantidade = parseInt(inputQtd.value);
+            const nome = nomeInput.value.trim();
+            const preco = parseFloat(precoInput.value);
 
-            if (nomeItem === '' || isNaN(valorUnitario) || isNaN(quantidade) || quantidade <= 0) {
-                alert('Por favor, preencha todos os campos corretamente!');
-                return;
+            if (!nome || isNaN(preco) || preco <= 0) return;
+
+            const novoProduto = {
+                id: Date.now(),
+                nome: nome,
+                preco: preco
+            };
+
+            produtos.unshift(novoProduto);
+            salvarEAtualizar();
+
+            nomeInput.value = '';
+            precoInput.value = '';
+            nomeInput.focus();
+        }
+
+        function removerProduto(id) {
+            produtos = produtos.filter(p => p.id !== id);
+            salvarEAtualizar();
+        }
+
+        function confirmarLimparTudo() {
+            if (produtos.length === 0) return;
+            if (confirm("Deseja realmente limpar todos os itens da sacola?")) {
+                produtos = [];
+                salvarEAtualizar();
             }
+        }
 
-            const itemExistente = listaItens.find(item => item.nome.toLowerCase() === nomeItem.toLowerCase());
+        function salvarEAtualizar() {
+            localStorage.setItem('feira_produtos', JSON.stringify(produtos));
+            atualizarTela();
+        }
 
-            if (itemExistente) {
-                itemExistente.qtd += quantidade;
-                itemExistente.total += (valorUnitario * quantidade);
+        function atualizarTela() {
+            const listaEl = document.getElementById('lista-produtos');
+            const estadoVazioEl = document.getElementById('estado-vazio');
+            const displayTotalEl = document.getElementById('display-total');
+            
+            // Render list or empty state
+            if (produtos.length === 0) {
+                estadoVazioEl.style.display = 'flex';
+                listaEl.innerHTML = '';
             } else {
-                listaItens.push({
-                    nome: nomeItem,
-                    qtd: quantidade,
-                    valorUnit: valorUnitario,
-                    total: valorUnitario * quantidade
-                });
+                estadoVazioEl.style.display = 'none';
+                listaEl.innerHTML = produtos.map(p => `
+                    <li class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex justify-between items-center transition hover:border-feiraGreen/50">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-lg bg-emerald-50 text-feiraGreen flex items-center justify-center font-bold text-sm">🍎</span>
+                            <div>
+                                <h4 class="font-semibold text-gray-800 text-sm">${escapeHtml(p.nome)}</h4>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold text-gray-900 text-sm">R$ ${p.preco.toFixed(2).replace('.', ',')}</span>
+                            <button onclick="removerProduto(${p.id})" class="text-gray-400 hover:text-feiraRed p-1 rounded-lg transition" title="Excluir">
+                                🗑️
+                            </button>
+                        </div>
+                    </li>
+                `).join('');
             }
 
-            renderizarTabela();
+            // Calculate total
+            const totalGeral = produtos.reduce((acc, curr) => acc + curr.preco, 0);
+            displayTotalEl.innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
 
-            // Limpa os campos
-            inputItem.value = '';
-            inputValor.value = '';
-            inputQtd.value = '1';
-            inputItem.focus();
+            // Update budget info
+            atualizarProgressoOrcamento(totalGeral);
+            atualizarTextoBotaoOrcamento();
         }
 
-        // 4. Recalcula valores, redesenha a tabela e salva no localStorage
-        function renderizarTabela() {
-            const corpoTabela = document.getElementById('corpo-tabela');
-            const elementoTotalGeral = document.getElementById('total-geral');
-            
-            corpoTabela.innerHTML = '';
-            totalAcumulado = 0;
+        function abrirConfigOrcamento() {
+            document.getElementById('input-orcamento-meta').value = orcamentoMaximo > 0 ? orcamentoMaximo : '';
+            document.getElementById('modal-orcamento').classList.remove('hidden');
+        }
 
-            listaItens.forEach((item) => {
-                const novaLinha = document.createElement('tr');
-                novaLinha.innerHTML = `
-                    <td>${item.nome}</td>
-                    <td>${item.qtd}</td>
-                    <td>R$ ${item.valorUnit.toFixed(2).replace('.', ',')}</td>
-                    <td>R$ ${item.total.toFixed(2).replace('.', ',')}</td>
-                `;
-                corpoTabela.appendChild(novaLinha);
-                totalAcumulado += item.total;
+        function fecharConfigOrcamento() {
+            document.getElementById('modal-orcamento').classList.add('hidden');
+        }
+
+        function salvarOrcamento() {
+            const valor = parseFloat(document.getElementById('input-orcamento-meta').value);
+            orcamentoMaximo = isNaN(valor) || valor < 0 ? 0 : valor;
+            localStorage.setItem('feira_orcamento', orcamentoMaximo);
+            fecharConfigOrcamento();
+            atualizarTela();
+        }
+
+        function removerOrcamento() {
+            orcamentoMaximo = 0;
+            localStorage.removeItem('feira_orcamento');
+            fecharConfigOrcamento();
+            atualizarTela();
+        }
+
+        function atualizarTextoBotaoOrcamento() {
+            const textoBtn = document.getElementById('btn-orcamento-texto');
+            if (orcamentoMaximo > 0) {
+                textoBtn.innerText = `Meta: R$ ${orcamentoMaximo.toFixed(2).replace('.', ',')}`;
+            } else {
+                textoBtn.innerText = `Definir Meta`;
+            }
+        }
+
+        function atualizarProgressoOrcamento(total) {
+            const container = document.getElementById('status-orcamento-container');
+            const barra = document.getElementById('barra-progresso');
+            const alerta = document.getElementById('alerta-orcamento');
+
+            if (orcamentoMaximo <= 0) {
+                container.classList.add('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            const porcentagem = (total / orcamentoMaximo) * 100;
+            barra.style.width = Math.min(porcentagem, 100) + '%';
+
+            if (total > orcamentoMaximo) {
+                barra.className = 'bg-feiraRed h-2.5 rounded-full transition-all duration-300';
+                alerta.innerText = `⚠️ Você ultrapassou o orçamento em R$ ${(total - orcamentoMaximo).toFixed(2).replace('.', ',')}!`;
+                alerta.className = 'text-xs mt-1 text-red-200 font-bold';
+            } else if (porcentagem >= 85) {
+                barra.className = 'bg-feiraYellow h-2.5 rounded-full transition-all duration-300';
+                alerta.innerText = `⚠️ Atenção! Próximo ao limite de R$ ${orcamentoMaximo.toFixed(2).replace('.', ',')}`;
+                alerta.className = 'text-xs mt-1 text-amber-100 font-bold';
+            } else {
+                barra.className = 'bg-feiraYellow h-2.5 rounded-full transition-all duration-300';
+                alerta.innerText = `Dentro da meta (${porcentagem.toFixed(0)}% do orçamento)`;
+                alerta.className = 'text-xs mt-1 text-emerald-100 font-medium';
+            }
+        }
+
+        function compartilharResumo() {
+            if (produtos.length === 0) {
+                mostrarMensagem("Aviso", "Adicione alguns produtos antes de compartilhar.");
+                return;
+            }
+            const totalGeral = produtos.reduce((acc, curr) => acc + curr.preco, 0);
+            let texto = "🛒 *Resumo da Feira Fácil*:\n\n";
+            produtos.forEach(p => {
+                texto += `- ${p.nome}: R$ ${p.preco.toFixed(2).replace('.', ',')}\n`;
             });
+            texto += `\n💰 *Total:* R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
 
-            elementoTotalGeral.textContent = totalAcumulado.toFixed(2).replace('.', ',');
-            
-            // SALVA A LISTA ATUALIZADA NO NAVEGADOR
-            localStorage.setItem('feira_itens', JSON.stringify(listaItens));
-            
-            atualizarSeletor(); 
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(texto).then(() => {
+                    mostrarMensagem("Sucesso", "Resumo copiado para a área de transferência!");
+                }).catch(() => {
+                    prompt("Copie o resumo abaixo:", texto);
+                });
+            } else {
+                prompt("Copie o resumo abaixo:", texto);
+            }
         }
 
-        // 5. Remove apenas a quantidade escolhida
-        function removerItem() {
-            const seletor = document.getElementById('seletor-produtos');
-            const inputQuantiaRemover = document.getElementById('quantia');
-            
-            const indexSelecionado = seletor.value;
-            const qtdParaRemover = parseInt(inputQuantiaRemover.value);
-
-            if (indexSelecionado === "") {
-                alert("Selecione um produto válido!");
-                return;
-            }
-
-            if (isNaN(qtdParaRemover) || qtdParaRemover <= 0) {
-                alert("Digite uma quantidade válida para remover!");
-                return;
-            }
-
-            const itemSelecionado = listaItens[indexSelecionado];
-
-            if (qtdParaRemover > itemSelecionado.qtd) {
-                alert(`Você não pode remover ${qtdParaRemover} itens. Você só tem ${itemSelecionado.qtd} na lista!`);
-                return;
-            }
-
-            itemSelecionado.qtd -= qtdParaRemover;
-            itemSelecionado.total -= (itemSelecionado.valorUnit * qtdParaRemover);
-
-            if (itemSelecionado.qtd === 0) {
-                listaItens.splice(indexSelecionado, 1);
-            }
-
-            renderizarTabela();
-            inputQuantiaRemover.value = '1';
-            alternarMenu();
+        // --- SCANNER E IA GEMINI ---
+        function abrirScanner() {
+            document.getElementById('modal-scanner').classList.remove('hidden');
         }
 
-        // 6. Limpa toda a lista e o armazenamento local
-        function concluirCompra() {
-            if (listaItens.length === 0) {
-                alert("Sua lista já está vazia!");
-                return;
+        function fecharScanner() {
+            pararCamera();
+            document.getElementById('modal-scanner').classList.add('hidden');
+        }
+
+        async function iniciarCamera() {
+            const videoEl = document.getElementById('camera-video');
+            const placeholderEl = document.getElementById('scanner-placeholder');
+            const controlsEl = document.getElementById('camera-controls');
+            const initialEl = document.getElementById('initial-scanner-controls');
+
+            try {
+                mediaStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment' },
+                    audio: false
+                });
+                videoEl.srcObject = mediaStream;
+                videoEl.classList.remove('hidden');
+                placeholderEl.classList.add('hidden');
+                controlsEl.classList.remove('hidden');
+                initialEl.classList.add('hidden');
+            } catch (err) {
+                mostrarMensagem("Câmera Indisponível", "Não foi possível acessar a câmera do dispositivo. Use a opção de galeria.");
+            }
+        }
+
+        function pararCamera() {
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+                mediaStream = null;
+            }
+            const videoEl = document.getElementById('camera-video');
+            const placeholderEl = document.getElementById('scanner-placeholder');
+            const controlsEl = document.getElementById('camera-controls');
+            const initialEl = document.getElementById('initial-scanner-controls');
+
+            videoEl.classList.add('hidden');
+            placeholderEl.classList.remove('hidden');
+            controlsEl.classList.add('hidden');
+            initialEl.classList.remove('hidden');
+        }
+
+        function tirarFoto() {
+            const videoEl = document.getElementById('camera-video');
+            const canvasEl = document.getElementById('camera-canvas');
+            
+            canvasEl.width = videoEl.videoWidth || 640;
+            canvasEl.height = videoEl.videoHeight || 480;
+            const ctx = canvasEl.getContext('2d');
+            ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
+
+            const base64Data = canvasEl.toDataURL('image/jpeg').split(',')[1];
+            pararCamera();
+            enviarParaGemini(base64Data, 'image/jpeg');
+        }
+
+        function processarArquivoImagem(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64String = e.target.result.split(',')[1];
+                enviarParaGemini(base64String, file.type);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function enviarParaGemini(base64Data, mimeType) {
+            const loadingEl = document.getElementById('scanner-loading');
+            loadingEl.classList.remove('hidden');
+
+            const systemPrompt = "Você é um assistente de compras inteligente para feiras e mercados. Analise a imagem fornecida (etiqueta de preço ou produto) e extraia o nome do produto e o preço unitário ou total visível. Retorne estritamente um JSON válido contendo as chaves 'nome' (string, nome amigável do produto) e 'preco' (number, valor numérico do preço, ex: 5.99). Se não encontrar o preço ou nome, estime ou preencha com valores padrão realistas baseados na imagem.";
+            const userQuery = "Extraia o nome do produto e o valor desta etiqueta em formato JSON.";
+            
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [
+                    {
+                        role: "user",
+                        parts: [
+                            { text: userQuery },
+                            {
+                                inlineData: {
+                                    mimeType: mimeType || "image/jpeg",
+                                    data: base64Data
+                                }
+                            }
+                        ]
+                    }
+                ],
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            "nome": { "type": "STRING", "description": "Nome do produto" },
+                            "preco": { "type": "NUMBER", "description": "Valor numérico do preço" }
+                        },
+                        "propertyOrdering": ["nome", "preco"]
+                    }
+                }
+            };
+
+            let tentado = 0;
+            const maxRetries = 3;
+            let sucesso = false;
+
+            while (tentado < maxRetries && !sucesso) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    if (!response.ok) throw new Error("Erro na API");
+
+                    const result = await response.json();
+                    const candidato = result.candidates?.[0];
+                    if (candidato && candidato.content?.parts?.[0]?.text) {
+                        const jsonText = candidato.content.parts[0].text;
+                        const dados = JSON.parse(jsonText);
+
+                        if (dados.nome && !isNaN(dados.preco)) {
+                            document.getElementById('input-nome').value = dados.nome;
+                            document.getElementById('input-preco').value = dados.preco.toFixed(2);
+                            sucesso = true;
+                        }
+                    }
+                    break;
+                } catch (err) {
+                    tentado++;
+                    if (tentado < maxRetries) {
+                        await new Promise(r => setTimeout(r, Math.pow(2, tentado) * 1000));
+                    }
+                }
             }
 
-            if (confirm("Deseja fechar e limpar a lista da feira?")) {
-                listaItens = []; // Esvazia o array
-                localStorage.removeItem('feira_itens'); // Apaga o registro do localStorage
-                renderizarTabela(); // Redesenha a tabela vazia
-                alert("Compra concluída com sucesso!");
+            loadingEl.classList.add('hidden');
+            fecharScanner();
+
+            if (sucesso) {
+                mostrarMensagem("Produto Detectado!", "O nome e o valor foram preenchidos automaticamente na sacola.");
+            } else {
+                mostrarMensagem("Atenção", "Não foi possível extrair os dados com clareza. Por favor, preencha manualmente.");
             }
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
         }
     </script>
 </body>
